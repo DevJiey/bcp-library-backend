@@ -1,5 +1,8 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 
+const isProduction =
+    process.env.NODE_ENV === "production";
+
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -13,8 +16,13 @@ const options = {
 
         servers: [
             {
-                url: "http://localhost:5000/api/v1",
-                description: "Local Development Server",
+                url: isProduction
+                    ? "https://bcp-library-backend-production.up.railway.app/api/v1"
+                    : "http://localhost:5000/api/v1",
+
+                description: isProduction
+                    ? "Production Server"
+                    : "Local Development Server",
             },
         ],
 
@@ -35,6 +43,7 @@ const options = {
     ],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
+const swaggerSpec =
+    swaggerJsdoc(options);
 
 module.exports = swaggerSpec;
