@@ -314,6 +314,121 @@ const updateMyProfile = async ({
     };
 };
 
+const updateBorrowerByAdmin = async ({
+    requestingUser,
+    userId,
+    email,
+    firstName,
+    middleName,
+    lastName,
+    program,
+    yearLevel,
+    section,
+    departmentId,
+    position,
+    employmentStatus,
+}) => {
+    if (
+        requestingUser.role !== "admin"
+    ) {
+        throw new AppError(
+            "Only administrators can update borrower information.",
+            403
+        );
+    }
+
+    const existingUser =
+        await getUserById(userId);
+
+    if (!existingUser) {
+        throw new AppError(
+            "User not found.",
+            404
+        );
+    }
+
+    if (
+        existingUser.role !== "borrower"
+    ) {
+        throw new AppError(
+            "Only borrower accounts can be updated using this endpoint.",
+            400
+        );
+    }
+
+    const existingEmail =
+        await findUserByEmail(email);
+
+    if (
+        existingEmail &&
+        String(existingEmail.id) !==
+            String(userId)
+    ) {
+        throw new AppError(
+            "Email already exists.",
+            409
+        );
+    }
+
+    const updatedUser =
+        await updateUserProfile({
+            userId,
+            email,
+            firstName,
+            middleName,
+            lastName,
+        });
+
+    let studentProfile = null;
+    let facultyProfile = null;
+
+    if (
+        existingUser.borrower_type ===
+        "student"
+    ) {
+        studentProfile =
+            await updateStudentProfile({
+                userId,
+                program,
+                yearLevel,
+                section,
+            });
+
+        if (!studentProfile) {
+            throw new AppError(
+                "Student profile not found.",
+                404
+            );
+        }
+    }
+
+    if (
+        existingUser.borrower_type ===
+        "faculty"
+    ) {
+        facultyProfile =
+            await updateFacultyProfile({
+                userId,
+                departmentId,
+                position,
+                employmentStatus,
+            });
+
+        if (!facultyProfile) {
+            throw new AppError(
+                "Faculty profile not found.",
+                404
+            );
+        }
+    }
+
+    return {
+        user: updatedUser,
+        studentProfile,
+        facultyProfile,
+    };
+};
+
 const changeUserStatus = async ({
     requestingUser,
     userId,
@@ -361,5 +476,6 @@ module.exports = {
     getUserDetails,
     getMyProfile,
     updateMyProfile,
+    updateBorrowerByAdmin,
     changeUserStatus,
 };

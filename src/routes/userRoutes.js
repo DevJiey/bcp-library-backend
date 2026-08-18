@@ -6,6 +6,7 @@ const {
     getUser,
     getCurrentUserProfile,
     updateCurrentUserProfile,
+    updateBorrowerAccount,
     updateUserAccountStatus,
 } = require("../controllers/UserController");
 
@@ -17,6 +18,7 @@ const {
     createAccountSchema,
     updateAccountStatusSchema,
     updateMyProfileSchema,
+    updateBorrowerSchema,
 } = require("../validators/userValidator");
 
 const router = express.Router();
@@ -86,7 +88,7 @@ const router = express.Router();
  *               section:
  *                 type: string
  *                 nullable: true
- *                 example: "BSIT-31008"
+ *                 example: "31008"
  *               departmentId:
  *                 type: integer
  *                 example: 1
@@ -218,7 +220,7 @@ router.get(
  *               section:
  *                 type: string
  *                 nullable: true
- *                 example: "BSIT-31008"
+ *                 example: "31008"
  *               departmentId:
  *                 type: integer
  *                 example: 1
@@ -287,6 +289,92 @@ router.get(
     authenticate,
     authorize("admin", "staff"),
     getUser
+);
+
+/**
+ * @swagger
+ * /users/{id}/profile:
+ *   patch:
+ *     summary: Update borrower information
+ *     description: Updates another borrower's personal and profile information. Admin access only.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Borrower user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - firstName
+ *               - lastName
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "corrected.student@example.com"
+ *               firstName:
+ *                 type: string
+ *                 example: "Juan"
+ *               middleName:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "Dela"
+ *               lastName:
+ *                 type: string
+ *                 example: "Cruz"
+ *               program:
+ *                 type: string
+ *                 example: "BSIT"
+ *               yearLevel:
+ *                 type: integer
+ *                 example: 3
+ *               section:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "31008"
+ *               departmentId:
+ *                 type: integer
+ *                 example: 1
+ *               position:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "Instructor"
+ *               employmentStatus:
+ *                 type: string
+ *                 example: "active"
+ *     responses:
+ *       200:
+ *         description: Borrower information updated successfully.
+ *       400:
+ *         description: Validation failed or target is not a borrower.
+ *       401:
+ *         description: Authentication required.
+ *       403:
+ *         description: Admin access required.
+ *       404:
+ *         description: Borrower not found.
+ *       409:
+ *         description: Email already exists.
+ *       500:
+ *         description: Internal server error.
+ */
+router.patch(
+    "/users/:id/profile",
+    authenticate,
+    authorize("admin"),
+    validateRequest(updateBorrowerSchema),
+    updateBorrowerAccount
 );
 
 /**

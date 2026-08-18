@@ -4,6 +4,7 @@ const {
     getUserDetails,
     getMyProfile,
     updateMyProfile,
+    updateBorrowerByAdmin,
     changeUserStatus,
 } = require("../services/UserService");
 
@@ -113,23 +114,72 @@ const updateCurrentUserProfile =
         }
     );
 
-const updateUserAccountStatus = asyncHandler(
-    async (req, res) => {
-        const user = await changeUserStatus({
-            requestingUser: req.user,
-            userId: req.params.id,
-            accountStatus:
-                req.body.accountStatus,
-        });
+const updateBorrowerAccount =
+    asyncHandler(
+        async (req, res) => {
+            const profile =
+                await updateBorrowerByAdmin({
+                    requestingUser:
+                        req.user,
+                    userId:
+                        req.params.id,
+                    ...req.body,
+                });
 
-        return res.status(200).json({
-            success: true,
-            message:
-                "User account status updated successfully.",
-            data: user,
-        });
-    }
-);
+            const {
+                ipAddress,
+                userAgent,
+            } = getRequestMetadata(req);
+
+            await recordAuditLog({
+                userId: req.user.id,
+                action:
+                    "UPDATE_BORROWER",
+                module: "Users",
+                entityType: "user",
+                entityId:
+                    req.params.id,
+                description:
+                    "Updated borrower account information.",
+                ipAddress,
+                userAgent,
+            });
+
+            return res
+                .status(200)
+                .json({
+                    success: true,
+                    message:
+                        "Borrower information updated successfully.",
+                    data: profile,
+                });
+        }
+    );
+
+const updateUserAccountStatus =
+    asyncHandler(
+        async (req, res) => {
+            const user =
+                await changeUserStatus({
+                    requestingUser:
+                        req.user,
+                    userId:
+                        req.params.id,
+                    accountStatus:
+                        req.body
+                            .accountStatus,
+                });
+
+            return res
+                .status(200)
+                .json({
+                    success: true,
+                    message:
+                        "User account status updated successfully.",
+                    data: user,
+                });
+        }
+    );
 
 module.exports = {
     createUserAccount,
@@ -137,5 +187,6 @@ module.exports = {
     getUser,
     getCurrentUserProfile,
     updateCurrentUserProfile,
+    updateBorrowerAccount,
     updateUserAccountStatus,
 };

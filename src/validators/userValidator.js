@@ -95,7 +95,8 @@ const createAccountSchema = z
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["borrowerType"],
-                message: "Borrower type is required.",
+                message:
+                    "Borrower type is required.",
             });
         }
 
@@ -106,7 +107,8 @@ const createAccountSchema = z
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["borrowerType"],
-                message: "Borrower type must not be provided for staff accounts.",
+                message:
+                    "Borrower type must not be provided for staff accounts.",
             });
         }
 
@@ -118,7 +120,8 @@ const createAccountSchema = z
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ["program"],
-                    message: "Program is required for student borrowers.",
+                    message:
+                        "Program is required for student borrowers.",
                 });
             }
 
@@ -126,7 +129,8 @@ const createAccountSchema = z
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ["yearLevel"],
-                    message: "Year level is required for student borrowers.",
+                    message:
+                        "Year level is required for student borrowers.",
                 });
             }
         }
@@ -139,7 +143,8 @@ const createAccountSchema = z
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ["departmentId"],
-                    message: "Department is required for faculty borrowers.",
+                    message:
+                        "Department is required for faculty borrowers.",
                 });
             }
 
@@ -147,7 +152,8 @@ const createAccountSchema = z
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ["employmentStatus"],
-                    message: "Employment status is required for faculty borrowers.",
+                    message:
+                        "Employment status is required for faculty borrowers.",
                 });
             }
         }
@@ -162,18 +168,23 @@ const createAccountSchema = z
                 ["section", data.section],
             ];
 
-            studentFields.forEach(([field, value]) => {
-                if (
-                    value !== undefined &&
-                    value !== null
-                ) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: [field],
-                        message: `${field} must only be provided for student borrowers.`,
-                    });
+            studentFields.forEach(
+                ([field, value]) => {
+                    if (
+                        value !== undefined &&
+                        value !== null
+                    ) {
+                        ctx.addIssue({
+                            code:
+                                z.ZodIssueCode
+                                    .custom,
+                            path: [field],
+                            message:
+                                `${field} must only be provided for student borrowers.`,
+                        });
+                    }
                 }
-            });
+            );
         }
 
         if (
@@ -181,45 +192,67 @@ const createAccountSchema = z
             data.borrowerType !== "faculty"
         ) {
             const facultyFields = [
-                ["departmentId", data.departmentId],
-                ["position", data.position],
-                ["employmentStatus", data.employmentStatus],
+                [
+                    "departmentId",
+                    data.departmentId,
+                ],
+                [
+                    "position",
+                    data.position,
+                ],
+                [
+                    "employmentStatus",
+                    data.employmentStatus,
+                ],
             ];
 
-            facultyFields.forEach(([field, value]) => {
-                if (
-                    value !== undefined &&
-                    value !== null
-                ) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: [field],
-                        message: `${field} must only be provided for faculty borrowers.`,
-                    });
+            facultyFields.forEach(
+                ([field, value]) => {
+                    if (
+                        value !== undefined &&
+                        value !== null
+                    ) {
+                        ctx.addIssue({
+                            code:
+                                z.ZodIssueCode
+                                    .custom,
+                            path: [field],
+                            message:
+                                `${field} must only be provided for faculty borrowers.`,
+                        });
+                    }
                 }
-            });
+            );
         }
     });
-const updateAccountStatusSchema = z.object({
-    accountStatus: z.enum([
-        "active",
-        "locked",
-        "inactive",
-        "suspended",
-    ]),
-});
-const updateMyProfileSchema = z
+
+const updateAccountStatusSchema =
+    z.object({
+        accountStatus: z.enum([
+            "active",
+            "locked",
+            "inactive",
+            "suspended",
+        ]),
+    });
+
+const borrowerProfileSchema = z
     .object({
         email: z
             .string()
             .trim()
-            .email("Please provide a valid email address.")
+            .email(
+                "Please provide a valid email address."
+            )
             .max(255),
 
         firstName: z
             .string()
             .trim()
-            .min(1, "First name is required.")
+            .min(
+                1,
+                "First name is required."
+            )
             .max(100),
 
         middleName: z
@@ -232,7 +265,10 @@ const updateMyProfileSchema = z
         lastName: z
             .string()
             .trim()
-            .min(1, "Last name is required.")
+            .min(
+                1,
+                "Last name is required."
+            )
             .max(100),
 
         program: z
@@ -281,16 +317,19 @@ const updateMyProfileSchema = z
             data.section !== undefined;
 
         const hasFacultyFields =
-            data.departmentId !== undefined ||
+            data.departmentId !==
+                undefined ||
             data.position !== undefined ||
-            data.employmentStatus !== undefined;
+            data.employmentStatus !==
+                undefined;
 
         if (
             hasStudentFields &&
             hasFacultyFields
         ) {
             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code:
+                    z.ZodIssueCode.custom,
                 message:
                     "Student and faculty profile fields cannot be updated together.",
             });
@@ -299,7 +338,9 @@ const updateMyProfileSchema = z
         if (hasStudentFields) {
             if (!data.program) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code:
+                        z.ZodIssueCode
+                            .custom,
                     path: ["program"],
                     message:
                         "Program is required for student profile updates.",
@@ -308,7 +349,9 @@ const updateMyProfileSchema = z
 
             if (!data.yearLevel) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code:
+                        z.ZodIssueCode
+                            .custom,
                     path: ["yearLevel"],
                     message:
                         "Year level is required for student profile updates.",
@@ -319,17 +362,27 @@ const updateMyProfileSchema = z
         if (hasFacultyFields) {
             if (!data.departmentId) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["departmentId"],
+                    code:
+                        z.ZodIssueCode
+                            .custom,
+                    path: [
+                        "departmentId",
+                    ],
                     message:
                         "Department is required for faculty profile updates.",
                 });
             }
 
-            if (!data.employmentStatus) {
+            if (
+                !data.employmentStatus
+            ) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["employmentStatus"],
+                    code:
+                        z.ZodIssueCode
+                            .custom,
+                    path: [
+                        "employmentStatus",
+                    ],
                     message:
                         "Employment status is required for faculty profile updates.",
                 });
@@ -337,8 +390,15 @@ const updateMyProfileSchema = z
         }
     });
 
+const updateMyProfileSchema =
+    borrowerProfileSchema;
+
+const updateBorrowerSchema =
+    borrowerProfileSchema;
+
 module.exports = {
     createAccountSchema,
     updateAccountStatusSchema,
     updateMyProfileSchema,
+    updateBorrowerSchema,
 };
