@@ -15,9 +15,9 @@ const startServer = async () => {
 
         startOverdueJob();
 
-        app.listen(PORT, () => {
+        app.listen(PORT, "0.0.0.0", () => {
             console.log(
-                `BCP Library API running on http://localhost:${PORT}`
+                `BCP Library API running on port ${PORT}`
             );
         });
     } catch (error) {
