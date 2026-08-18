@@ -14,9 +14,14 @@ yarn-error.log*
 
 # Database backups
 backups/
-*.sql
 *.dump
 *.backup
+
+# Ignore SQL backup files only inside backups
+backups/*.sql
+
+# Keep migration SQL files
+!src/database/migrations/*.sql
 
 # OS / Editor files
 .DS_Store
