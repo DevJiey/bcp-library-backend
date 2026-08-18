@@ -6,9 +6,14 @@ const pool = require("../config/database");
 const seedAdmin = async () => {
     const schoolId = "ADMIN-001";
     const email = "admin@bcp-library.local";
-    const password = "Admin12345";
-
     try {
+        const password = process.env.ADMIN_INITIAL_PASSWORD;
+
+        if (!password) {
+            throw new Error(
+                "ADMIN_INITIAL_PASSWORD environment variable is required."
+            );
+        }
         const existingAdmin = await pool.query(
             `
             SELECT id
