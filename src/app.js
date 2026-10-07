@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
 const errorHandler = require("./middlewares/errorHandler");
+
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -26,7 +27,14 @@ const backupRoutes = require("./routes/backupRoutes");
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        credentials: true,
+    })
+);
+
 app.use(express.json());
 
 app.use("/api/v1", userRoutes);
@@ -46,6 +54,7 @@ app.use("/api/v1", auditLogRoutes);
 app.use("/api/v1", reportRoutes);
 app.use("/api/v1", librarySettingRoutes);
 app.use("/api/v1", backupRoutes);
+app.use("/api/v1", authRoutes);
 
 /**
  * @swagger
@@ -67,15 +76,12 @@ app.get("/api/v1/health", (req, res) => {
     });
 });
 
-app.use("/api/v1", authRoutes);
-
 app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec)
 );
 
-/* ERROR HANDLER MUST BE LAST */
 app.use(errorHandler);
 
 module.exports = app;

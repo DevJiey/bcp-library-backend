@@ -6,6 +6,7 @@ const pool = require("../config/database");
 const seedAdmin = async () => {
     const schoolId = "ADMIN-001";
     const email = "admin@bcp-library.local";
+
     try {
         const password = process.env.ADMIN_INITIAL_PASSWORD;
 
@@ -14,6 +15,7 @@ const seedAdmin = async () => {
                 "ADMIN_INITIAL_PASSWORD environment variable is required."
             );
         }
+
         const existingAdmin = await pool.query(
             `
             SELECT id
@@ -74,7 +76,6 @@ const seedAdmin = async () => {
 
         console.log("Admin account created successfully.");
         console.log(`School ID: ${schoolId}`);
-        console.log(`Temporary Password: ${password}`);
     } catch (error) {
         console.error("Failed to create admin account:", error.message);
         process.exitCode = 1;

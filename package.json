@@ -1,8 +1,8 @@
 {
   "name": "bcp-library-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "REST API backend for the BCP Library Management System",
+  "main": "api/index.js",
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
@@ -11,10 +11,18 @@
     "seed:departments": "node src/database/seedDepartments.js",
     "seed:catalog": "node src/database/seedLibraryCatalog.js"
   },
-  "keywords": [],
+  "keywords": [
+    "library-management-system",
+    "rest-api",
+    "express",
+    "postgresql"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
@@ -23,7 +31,7 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "node-cron": "^4.6.0",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^10.0.15",
     "pg": "^8.23.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",

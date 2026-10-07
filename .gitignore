@@ -30,3 +30,32 @@ Thumbs.db
 
 # Coverage
 coverage/
+
+# Local class import files
+Masterlist-BSIT31008.csv
+classmate-credentials.json
+importClassmates.js
+
+sendClassmateCredentials.js
+resendCredentials.js
+manageClassmates.js
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# Database backups
+backups/
+*.sql
+*.backup
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
