@@ -22,6 +22,7 @@ const auditLogRoutes = require("./routes/auditLogRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const librarySettingRoutes = require("./routes/librarySettingRoutes");
 const backupRoutes = require("./routes/backupRoutes");
+const cronRoutes = require("./routes/cronRoutes");
 
 const app = express();
 
@@ -55,7 +56,9 @@ app.use("/api/v1", auditLogRoutes);
 app.use("/api/v1", reportRoutes);
 app.use("/api/v1", librarySettingRoutes);
 app.use("/api/v1", backupRoutes);
+app.use("/api/v1", cronRoutes);
 app.use("/api/v1", authRoutes);
+
 
 /**
  * @swagger

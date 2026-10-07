@@ -4,5 +4,11 @@
       "source": "/(.*)",
       "destination": "/api"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/v1/internal/cron/overdue",
+      "schedule": "0 0 * * *"
+    }
   ]
 }
