@@ -17,7 +17,7 @@ const options = {
         servers: [
             {
                 url: isProduction
-                    ? "https://bcp-library-backend-production.up.railway.app/api/v1"
+                    ? "https://bcp-library-backend.vercel.app/api/v1"
                     : "http://localhost:5000/api/v1",
 
                 description: isProduction

@@ -78,7 +78,7 @@ app.get("/api/v1/health", (req, res) => {
 
 app.use(
     "/api-docs",
-    swaggerUi.serve,
+    swaggerUi.serveFiles(swaggerSpec),
     swaggerUi.setup(swaggerSpec)
 );
 
