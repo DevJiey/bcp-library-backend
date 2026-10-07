@@ -5,73 +5,55 @@ const {
     editPublisher,
 } = require("../services/PublisherService");
 
-const createPublisher = async (req, res) => {
-    try {
-        const publisher = await addPublisher(req.body);
+const asyncHandler = require("../middlewares/asyncHandler");
+
+const createPublisher = asyncHandler(
+    async (req, res) => {
+        const publisher = await addPublisher(
+            req.body
+        );
 
         return res.status(201).json({
             success: true,
-            message: "Publisher created successfully.",
+            message:
+                "Publisher created successfully.",
             data: publisher,
         });
-    } catch (error) {
-        const statusCode = error.statusCode || 500;
-
-        return res.status(statusCode).json({
-            success: false,
-            message:
-                error.message ||
-                "Failed to create publisher.",
-        });
     }
-};
+);
 
-const getPublishers = async (req, res) => {
-    try {
-        const publishers = await listPublishers();
+const getPublishers = asyncHandler(
+    async (req, res) => {
+        const publishers =
+            await listPublishers();
 
         return res.status(200).json({
             success: true,
-            message: "Publishers retrieved successfully.",
+            message:
+                "Publishers retrieved successfully.",
             data: publishers,
         });
-    } catch (error) {
-        const statusCode = error.statusCode || 500;
-
-        return res.status(statusCode).json({
-            success: false,
-            message:
-                error.message ||
-                "Failed to retrieve publishers.",
-        });
     }
-};
+);
 
-const getPublisher = async (req, res) => {
-    try {
-        const publisher = await getPublisherDetails(
-            req.params.id
-        );
+const getPublisher = asyncHandler(
+    async (req, res) => {
+        const publisher =
+            await getPublisherDetails(
+                req.params.id
+            );
 
         return res.status(200).json({
             success: true,
-            message: "Publisher retrieved successfully.",
+            message:
+                "Publisher retrieved successfully.",
             data: publisher,
         });
-    } catch (error) {
-        const statusCode = error.statusCode || 500;
-
-        return res.status(statusCode).json({
-            success: false,
-            message:
-                error.message ||
-                "Failed to retrieve publisher.",
-        });
     }
-};
+);
 
-const updatePublisher = async (req, res) => {
-    try {
+const updatePublisher = asyncHandler(
+    async (req, res) => {
         const publisher = await editPublisher({
             publisherId: req.params.id,
             ...req.body,
@@ -79,20 +61,12 @@ const updatePublisher = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Publisher updated successfully.",
+            message:
+                "Publisher updated successfully.",
             data: publisher,
         });
-    } catch (error) {
-        const statusCode = error.statusCode || 500;
-
-        return res.status(statusCode).json({
-            success: false,
-            message:
-                error.message ||
-                "Failed to update publisher.",
-        });
     }
-};
+);
 
 module.exports = {
     createPublisher,

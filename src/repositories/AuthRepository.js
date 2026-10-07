@@ -53,6 +53,54 @@ const findUserById = async (userId) => {
     return result.rows[0] || null;
 };
 
+const findUserWithPasswordById = async (
+    userId
+) => {
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            school_id,
+            password_hash,
+            account_status,
+            is_first_login
+        FROM users
+        WHERE id = $1
+        LIMIT 1
+        `,
+        [userId]
+    );
+
+    return result.rows[0] || null;
+};
+
+const updateUserPassword = async ({
+    userId,
+    passwordHash,
+}) => {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET
+            password_hash = $2,
+            is_first_login = FALSE,
+            updated_at = NOW()
+        WHERE id = $1
+        RETURNING
+            id,
+            school_id,
+            is_first_login,
+            updated_at
+        `,
+        [
+            userId,
+            passwordHash,
+        ]
+    );
+
+    return result.rows[0] || null;
+};
+
 const updateLastLogin = async (userId) => {
     await pool.query(
         `
@@ -67,5 +115,7 @@ const updateLastLogin = async (userId) => {
 module.exports = {
     findUserBySchoolId,
     findUserById,
+    findUserWithPasswordById,
+    updateUserPassword,
     updateLastLogin,
 };

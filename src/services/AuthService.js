@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const {
     findUserBySchoolId,
     findUserById,
+    findUserWithPasswordById,
+    updateUserPassword,
     updateLastLogin,
 } = require("../repositories/AuthRepository");
 
@@ -130,7 +132,74 @@ const getCurrentUser = async (
     };
 };
 
+const changePassword = async ({
+    userId,
+    currentPassword,
+    newPassword,
+}) => {
+    const user =
+        await findUserWithPasswordById(
+            userId
+        );
+
+    if (!user) {
+        throw new AppError(
+            "User account not found.",
+            404
+        );
+    }
+
+    const passwordMatches =
+        await bcrypt.compare(
+            currentPassword,
+            user.password_hash
+        );
+
+    if (!passwordMatches) {
+        throw new AppError(
+            "Current password is incorrect.",
+            400
+        );
+    }
+
+    const samePassword =
+        await bcrypt.compare(
+            newPassword,
+            user.password_hash
+        );
+
+    if (samePassword) {
+        throw new AppError(
+            "New password must be different from the current password.",
+            400
+        );
+    }
+
+    const passwordHash =
+        await bcrypt.hash(
+            newPassword,
+            12
+        );
+
+    const updatedUser =
+        await updateUserPassword({
+            userId,
+            passwordHash,
+        });
+
+    return {
+        id: updatedUser.id,
+        schoolId:
+            updatedUser.school_id,
+        isFirstLogin:
+            updatedUser.is_first_login,
+        updatedAt:
+            updatedUser.updated_at,
+    };
+};
+
 module.exports = {
     login,
     getCurrentUser,
+    changePassword,
 };
