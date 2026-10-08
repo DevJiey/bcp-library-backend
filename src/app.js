@@ -23,6 +23,7 @@ const reportRoutes = require("./routes/reportRoutes");
 const librarySettingRoutes = require("./routes/librarySettingRoutes");
 const backupRoutes = require("./routes/backupRoutes");
 const cronRoutes = require("./routes/cronRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use("/api/v1", librarySettingRoutes);
 app.use("/api/v1", backupRoutes);
 app.use("/api/v1", cronRoutes);
 app.use("/api/v1", authRoutes);
+app.use("/api/v1", aiRoutes);
 
 
 /**
