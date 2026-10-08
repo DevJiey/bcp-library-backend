@@ -1,32 +1,50 @@
+
 const { Pool } = require("pg");
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction =
+    process.env.NODE_ENV === "production";
 
-const poolConfig = process.env.DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL;
+
+const poolConfig = databaseUrl
     ? {
-          connectionString: process.env.DATABASE_URL,
-          ssl: isProduction
-              ? {
-                    rejectUnauthorized: false,
-                }
-              : false,
+          connectionString: databaseUrl,
+
+          // Require TLS and verify the database
+          // server's SSL certificate.
+          ssl: {
+              rejectUnauthorized: true,
+          },
       }
     : {
           host: process.env.DB_HOST,
-          port: process.env.DB_PORT,
+          port: process.env.DB_PORT
+              ? Number(process.env.DB_PORT)
+              : 5432,
           database: process.env.DB_NAME,
           user: process.env.DB_USER,
           password: process.env.DB_PASSWORD,
+
+          // Local PostgreSQL typically runs
+          // without TLS.
+          ssl: false,
       };
 
 const pool = new Pool(poolConfig);
 
 pool.on("connect", () => {
-    console.log("Connected to PostgreSQL database.");
+    if (!isProduction) {
+        console.log(
+            "Connected to PostgreSQL database."
+        );
+    }
 });
 
 pool.on("error", (error) => {
-    console.error("PostgreSQL connection error:", error.message);
+    console.error(
+        "PostgreSQL connection error:",
+        error.message
+    );
 });
 
 module.exports = pool;
