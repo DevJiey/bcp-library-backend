@@ -27,6 +27,17 @@ const login = async ({
         );
     }
 
+
+    if (
+        user.account_status === "pending"
+    ) {
+        throw new AppError(
+            "Please complete your account setup using the invitation link sent to your email.",
+            403
+        );
+    }
+
+
     if (
         user.account_status === "inactive"
     ) {

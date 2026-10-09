@@ -247,7 +247,7 @@ const updateMyProfile = async ({
     if (
         existingEmail &&
         String(existingEmail.id) !==
-            String(userId)
+        String(userId)
     ) {
         throw new AppError(
             "Email already exists.",
@@ -362,7 +362,7 @@ const updateBorrowerByAdmin = async ({
     if (
         existingEmail &&
         String(existingEmail.id) !==
-            String(userId)
+        String(userId)
     ) {
         throw new AppError(
             "Email already exists.",
@@ -456,13 +456,25 @@ const changeUserStatus = async ({
     if (
         existingUser.role === "admin" &&
         String(existingUser.id) ===
-            String(requestingUser.id)
+        String(requestingUser.id)
     ) {
         throw new AppError(
             "You cannot change the status of your own admin account.",
             400
         );
     }
+
+
+    if (
+        existingUser.role === "borrower" &&
+        existingUser.account_status === "pending"
+    ) {
+        throw new AppError(
+            "This borrower has not completed account setup. Please resend the invitation instead of changing the account status.",
+            400
+        );
+    }
+
 
     return await updateUserStatus({
         userId,

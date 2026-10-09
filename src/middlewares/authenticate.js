@@ -53,6 +53,14 @@ const authenticate = async (
             });
         }
 
+        if (user.account_status === "pending") {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "Please complete your account setup before signing in.",
+            });
+        }
+
         if (
             user.account_status === "inactive"
         ) {

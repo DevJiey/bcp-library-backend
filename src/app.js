@@ -5,6 +5,7 @@ const swaggerSpec = require("./docs/swagger");
 const errorHandler = require("./middlewares/errorHandler");
 
 const userRoutes = require("./routes/userRoutes");
+const borrowerInvitationRoutes = require("./routes/borrowerInvitationRoutes");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const publisherRoutes = require("./routes/publisherRoutes");
@@ -26,6 +27,12 @@ const cronRoutes = require("./routes/cronRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
+
+// Trust the immediate reverse proxy in production.
+// Allows Express to determine the client IP behind Vercel.
+if (process.env.VERCEL === "1") {
+    app.set("trust proxy", 1);
+}
 
 app.use(helmet());
 
@@ -62,6 +69,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/v1", userRoutes);
+app.use("/api/v1", borrowerInvitationRoutes);
 app.use("/api/v1", categoryRoutes);
 app.use("/api/v1", publisherRoutes);
 app.use("/api/v1", authorRoutes);
