@@ -16,6 +16,7 @@ const {
 } = require("../utils/dateTime");
 
 const AppError = require("../utils/AppError");
+const { sendPushToUser } = require("./PushNotificationService");
 
 const listPendingRequests = async () => {
     return await getPendingBorrowRequests();
@@ -146,6 +147,8 @@ const approveRequest = async ({
      * an already successful borrowing.
      */
     try {
+        const pushTitle = "Borrow Request Approved";
+        const pushBody = `Your request for "${request.title}" has been approved. Due date: ${new Date(dueAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`;
         await createNotification({
             userId:
                 request.borrower_id,
@@ -174,6 +177,15 @@ const approveRequest = async ({
             relatedEntityId:
                 request.id,
         });
+        try {
+            await sendPushToUser({
+                userId: request.borrower_id,
+                title: pushTitle,
+                body: pushBody,
+            });
+        } catch (pushError) {
+            console.error("Failed to deliver borrower push:", pushError.message);
+        }
     } catch (error) {
         console.error(
             "Failed to create approval notification:",
@@ -217,11 +229,17 @@ const rejectRequest = async ({
             rejectionReason,
         });
 
+    if (!rejectedRequest) {
+        throw new AppError("Borrow request is no longer pending.", 409);
+    }
+
     /*
      * Create borrower notification
      * after successful rejection.
      */
     try {
+        const pushTitle = "Borrow Request Rejected";
+        const pushBody = `Your request for "${request.title}" was rejected. Reason: ${rejectionReason}`;
         await createNotification({
             userId:
                 request.borrower_id,
@@ -241,6 +259,15 @@ const rejectRequest = async ({
             relatedEntityId:
                 request.id,
         });
+        try {
+            await sendPushToUser({
+                userId: request.borrower_id,
+                title: pushTitle,
+                body: pushBody,
+            });
+        } catch (pushError) {
+            console.error("Failed to deliver borrower push:", pushError.message);
+        }
     } catch (error) {
         console.error(
             "Failed to create rejection notification:",

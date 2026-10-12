@@ -133,51 +133,37 @@ const approveBorrowRequest = async ({
     try {
         await client.query("BEGIN");
 
-        const transactionResult = await client.query(
-            `
+        // Serialize competing approvals/rejections on the request row.
+        const locked = await client.query(
+            "SELECT id FROM borrow_requests WHERE id = $1 AND status = 'pending' FOR UPDATE",
+            [requestId]
+        );
+        if (!locked.rowCount) {
+            const err = new Error("Borrow request is no longer pending.");
+            err.statusCode = 409;
+            throw err;
+        }
+        // Claim an available copy atomically while holding its row lock.
+        const claimed = await client.query(`
+            UPDATE book_copies SET status = 'borrowed'
+            WHERE id = $1 AND status = 'available'
+              AND condition NOT IN ('damaged', 'lost')
+            RETURNING id
+        `, [bookCopyId]);
+        if (!claimed.rowCount) {
+            const err = new Error("Book copy is no longer available.");
+            err.statusCode = 409;
+            throw err;
+        }
+        const transactionResult = await client.query(`
             INSERT INTO borrow_transactions (
-                borrow_request_id,
-                borrower_id,
-                book_copy_id,
-                processed_by,
-                due_at
-            )
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *
-            `,
-            [
-                requestId,
-                borrowerId,
-                bookCopyId,
-                staffId,
-                dueAt,
-            ]
-        );
-
-        await client.query(
-            `
-            UPDATE book_copies
-            SET status = 'borrowed'
-            WHERE id = $1
-            `,
-            [bookCopyId]
-        );
-
-        await client.query(
-            `
-            UPDATE borrow_requests
-            SET
-                status = 'approved',
-                reviewed_by = $1,
-                reviewed_at = NOW()
-            WHERE id = $2
-            `,
-            [
-                staffId,
-                requestId,
-            ]
-        );
-
+                borrow_request_id, borrower_id, book_copy_id, processed_by, due_at
+            ) VALUES ($1, $2, $3, $4, $5) RETURNING *
+        `, [requestId, borrowerId, bookCopyId, staffId, dueAt]);
+        await client.query(`
+            UPDATE borrow_requests SET status = 'approved', reviewed_by = $1,
+                reviewed_at = NOW() WHERE id = $2
+        `, [staffId, requestId]);
         await client.query("COMMIT");
 
         return transactionResult.rows[0];
@@ -202,7 +188,7 @@ const rejectBorrowRequest = async ({
             rejection_reason = $1,
             reviewed_by = $2,
             reviewed_at = NOW()
-        WHERE id = $3
+        WHERE id = $3 AND status = 'pending'
         RETURNING *
         `,
         [

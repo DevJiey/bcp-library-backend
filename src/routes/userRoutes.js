@@ -21,7 +21,11 @@ const {
     updateBorrowerSchema,
 } = require("../validators/userValidator");
 
+const { correctPendingBorrowerEmail } = require("../controllers/PendingBorrowerCorrectionController");
+
 const router = express.Router();
+
+router.patch("/users/:id/pending-email", authenticate, authorize("admin"), correctPendingBorrowerEmail);
 
 /**
  * @swagger

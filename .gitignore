@@ -59,3 +59,5 @@ backups/
 # OS files
 .DS_Store
 Thumbs.db
+
+firebase-vercel-secret.txt
